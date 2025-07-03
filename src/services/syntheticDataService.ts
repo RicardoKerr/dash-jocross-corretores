@@ -12,6 +12,10 @@ interface SyntheticLead {
   Resumo: string;
   Whatsapp_corretor: string;
   created_at: string;
+  status_conversa: string;
+  corretor_responsavel: string;
+  resumo_detalhado: string;
+  data_ultima_interacao: string;
 }
 
 // Dados sintéticos realistas para geração
@@ -38,6 +42,14 @@ const especialistas = [
   "Dra. Patrícia Oftalmologista"
 ];
 
+const corretores = [
+  "Carlos Silva - Corretor Senior", "Ana Paula - Especialista Familiar", "Roberto Santos - Corretor Empresarial",
+  "Maria Fernanda - Consultora Individual", "José Carlos - Corretor Master", "Luciana Costa - Especialista Sênior",
+  "Pedro Henrique - Corretor Pleno", "Beatriz Lima - Consultora Premium", "Fernando Rocha - Especialista Gold",
+  "Camila Alves - Corretor Executivo"
+];
+
+const statusConversa = ["Interessado", "Negociando", "Proposta Enviada", "Aguardando Documentos", "Fechado", "Perdido"];
 const idades = ["18-25", "26-35", "36-45", "46-55", "56-65", "65+"];
 const planoStatus = ["Sim", "Não"];
 const planoTipos = ["Individual", "Familiar", "Empresarial"];
@@ -54,6 +66,19 @@ const resumos = [
   "Executivo com plano empresarial",
   "Estudante universitário",
   "Mãe solteira com filhos pequenos"
+];
+
+const resumosDetalhados = [
+  "Lead demonstrou interesse em plano básico. Precisa de cobertura para emergências. Orçamento limitado de R$ 200/mês.",
+  "Família de 4 pessoas busca cobertura completa. Priorizam pediatria e maternidade. Orçamento até R$ 800/mês.",
+  "Empresa com 25 funcionários. Interessados em plano corporativo com cobertura nacional. Orçamento R$ 15.000/mês.",
+  "Cliente com histórico de diabetes tipo 2. Necessita cobertura para endocrinologia. Disposto a pagar até R$ 400/mês.",
+  "Casal jovem planejando primeiro filho. Querem cobertura maternidade. Orçamento flexível até R$ 600/mês.",
+  "Aposentado de 68 anos. Precisa de cobertura geriátrica completa. Já possui plano, quer migrar por melhor preço.",
+  "Advogado autônomo. Busca plano individual com boa rede credenciada em SP. Orçamento até R$ 350/mês.",
+  "Executivo de multinacional. Empresa oferece plano básico, quer complementar com cobertura premium particular.",
+  "Universitário de 22 anos. Pais querem contratar plano individual. Foco em emergências e clínica geral.",
+  "Mãe solteira com 2 filhos pequenos. Prioridade pediatria e emergência infantil. Orçamento apertado R$ 250/mês."
 ];
 
 function generateRandomDate(startDate: Date, endDate: Date): string {
@@ -86,6 +111,8 @@ export function generateSyntheticData(count: number = 150): SyntheticLead[] {
 
   for (let i = 0; i < count; i++) {
     const nome = getRandomItem(nomes);
+    const createdAt = generateRandomDate(startDate, endDate);
+    const lastInteraction = generateRandomDate(new Date(createdAt), endDate);
     
     leads.push({
       nome,
@@ -98,7 +125,11 @@ export function generateSyntheticData(count: number = 150): SyntheticLead[] {
       Especialista: getRandomItem(especialistas),
       Resumo: getRandomItem(resumos),
       Whatsapp_corretor: generateWhatsApp(),
-      created_at: generateRandomDate(startDate, endDate)
+      created_at: createdAt,
+      status_conversa: getRandomItem(statusConversa),
+      corretor_responsavel: getRandomItem(corretores),
+      resumo_detalhado: getRandomItem(resumosDetalhados),
+      data_ultima_interacao: lastInteraction
     });
   }
 

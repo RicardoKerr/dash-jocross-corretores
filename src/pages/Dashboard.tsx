@@ -14,6 +14,9 @@ import { Search, Filter, RefreshCw, Database, BarChart3, Lightbulb } from "lucid
 import { KPICards } from "@/components/dashboard/KPICards";
 import { AdvancedCharts } from "@/components/dashboard/AdvancedCharts";
 import { InsightsPanel } from "@/components/dashboard/InsightsPanel";
+import { ConversionFunnel } from "@/components/dashboard/ConversionFunnel";
+import { ConversionPieChart } from "@/components/dashboard/ConversionPieChart";
+import { LeadSummaryModal } from "@/components/dashboard/LeadSummaryModal";
 import { generateSyntheticData, insertSyntheticData } from "@/services/syntheticDataService";
 
 interface LeadData {
@@ -29,6 +32,10 @@ interface LeadData {
   Resumo: string | null;
   Whatsapp_corretor: string | null;
   created_at: string;
+  status_conversa?: string;
+  corretor_responsavel?: string;
+  resumo_detalhado?: string;
+  data_ultima_interacao?: string;
 }
 
 const Dashboard = () => {
@@ -39,6 +46,10 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCampaign, setSelectedCampaign] = useState<string>("");
   const [selectedSpecialist, setSelectedSpecialist] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [selectedCorretor, setSelectedCorretor] = useState<string>("");
+  const [selectedLead, setSelectedLead] = useState<LeadData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchLeads();
@@ -112,11 +123,21 @@ const Dashboard = () => {
       filtered = filtered.filter(lead => lead.Especialista === selectedSpecialist);
     }
 
+    if (selectedStatus && selectedStatus !== "ALL_STATUS") {
+      filtered = filtered.filter(lead => lead.status_conversa === selectedStatus);
+    }
+
+    if (selectedCorretor && selectedCorretor !== "ALL_CORRETORES") {
+      filtered = filtered.filter(lead => lead.corretor_responsavel === selectedCorretor);
+    }
+
     setFilteredLeads(filtered);
-  }, [searchTerm, selectedCampaign, selectedSpecialist, leads]);
+  }, [searchTerm, selectedCampaign, selectedSpecialist, selectedStatus, selectedCorretor, leads]);
 
   const campaigns = [...new Set(leads.map(l => l.campanha).filter(Boolean))];
   const specialists = [...new Set(leads.map(l => l.Especialista).filter(Boolean))];
+  const statuses = [...new Set(leads.map(l => l.status_conversa).filter(Boolean))];
+  const corretores = [...new Set(leads.map(l => l.corretor_responsavel).filter(Boolean))];
 
   if (loading) {
     return (
@@ -207,12 +228,40 @@ const Dashboard = () => {
                   ))}
                 </SelectContent>
               </Select>
+              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                <SelectTrigger className="w-full md:w-[180px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL_STATUS">Todos os status</SelectItem>
+                  {statuses.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={selectedCorretor} onValueChange={setSelectedCorretor}>
+                <SelectTrigger className="w-full md:w-[180px]">
+                  <SelectValue placeholder="Corretor" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL_CORRETORES">Todos os corretores</SelectItem>
+                  {corretores.map((corretor) => (
+                    <SelectItem key={corretor} value={corretor}>
+                      {corretor?.split(' - ')[0] || corretor}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Button 
                 variant="outline" 
                 onClick={() => {
                   setSearchTerm("");
                   setSelectedCampaign("ALL_CAMPAIGNS");
                   setSelectedSpecialist("ALL_SPECIALISTS");
+                  setSelectedStatus("ALL_STATUS");
+                  setSelectedCorretor("ALL_CORRETORES");
                 }}
               >
                 Limpar
@@ -240,6 +289,15 @@ const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
+            {/* Funil de Conversão */}
+            <ConversionFunnel leads={leads} />
+            
+            {/* Gráficos de Conversão */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ConversionPieChart leads={leads} groupBy="status" />
+              <ConversionPieChart leads={leads} groupBy="corretor" />
+            </div>
+            
             {/* Gráficos Básicos */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
@@ -322,22 +380,25 @@ const Dashboard = () => {
               <CardContent>
                 <div className="overflow-x-auto">
                   <Table>
-                    <TableHeader>
+                     <TableHeader>
                       <TableRow>
                         <TableHead>Nome</TableHead>
-                        <TableHead>Email</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Corretor</TableHead>
                         <TableHead>Campanha</TableHead>
                         <TableHead>Tem Plano</TableHead>
-                        <TableHead>Idade</TableHead>
-                        <TableHead>Especialista</TableHead>
                         <TableHead>Data</TableHead>
+                        <TableHead>Ações</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredLeads.map((lead) => (
                         <TableRow key={lead.id}>
                           <TableCell className="font-medium">{lead.nome || 'N/A'}</TableCell>
-                          <TableCell>{lead.email || 'N/A'}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{lead.status_conversa || 'N/A'}</Badge>
+                          </TableCell>
+                          <TableCell>{lead.corretor_responsavel?.split(' - ')[0] || 'N/A'}</TableCell>
                           <TableCell>
                             <Badge variant="outline">{lead.campanha || 'N/A'}</Badge>
                           </TableCell>
@@ -348,10 +409,20 @@ const Dashboard = () => {
                               {lead.PossuiPlanoDeSaude || 'N/A'}
                             </Badge>
                           </TableCell>
-                          <TableCell>{lead.Idade || 'N/A'}</TableCell>
-                          <TableCell>{lead.Especialista || 'N/A'}</TableCell>
                           <TableCell>
                             {new Date(lead.created_at).toLocaleDateString('pt-BR')}
+                          </TableCell>
+                          <TableCell>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                setSelectedLead(lead);
+                                setIsModalOpen(true);
+                              }}
+                            >
+                              Ver Resumo
+                            </Button>
                           </TableCell>
                         </TableRow>
                       ))}
