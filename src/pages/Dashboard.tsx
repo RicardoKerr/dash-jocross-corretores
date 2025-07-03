@@ -70,11 +70,11 @@ const Dashboard = () => {
       );
     }
 
-    if (selectedCampaign) {
+    if (selectedCampaign && selectedCampaign !== "ALL_CAMPAIGNS") {
       filtered = filtered.filter(lead => lead.campanha === selectedCampaign);
     }
 
-    if (selectedSpecialist) {
+    if (selectedSpecialist && selectedSpecialist !== "ALL_SPECIALISTS") {
       filtered = filtered.filter(lead => lead.Especialista === selectedSpecialist);
     }
 
@@ -230,7 +230,7 @@ const Dashboard = () => {
                   <SelectValue placeholder="Campanha" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas as campanhas</SelectItem>
+                  <SelectItem value="ALL_CAMPAIGNS">Todas as campanhas</SelectItem>
                   {campaigns.map((campaign) => (
                     <SelectItem key={campaign} value={campaign}>
                       {campaign}
@@ -243,7 +243,7 @@ const Dashboard = () => {
                   <SelectValue placeholder="Especialista" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os especialistas</SelectItem>
+                  <SelectItem value="ALL_SPECIALISTS">Todos os especialistas</SelectItem>
                   {specialists.map((specialist) => (
                     <SelectItem key={specialist} value={specialist}>
                       {specialist}
@@ -255,8 +255,8 @@ const Dashboard = () => {
                 variant="outline" 
                 onClick={() => {
                   setSearchTerm("");
-                  setSelectedCampaign("");
-                  setSelectedSpecialist("");
+                  setSelectedCampaign("ALL_CAMPAIGNS");
+                  setSelectedSpecialist("ALL_SPECIALISTS");
                 }}
               >
                 Limpar
