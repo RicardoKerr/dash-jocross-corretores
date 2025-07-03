@@ -10,7 +10,11 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Filter, Users, Target, TrendingUp, DollarSign } from "lucide-react";
+import { Search, Filter, RefreshCw, Database, BarChart3, Lightbulb } from "lucide-react";
+import { KPICards } from "@/components/dashboard/KPICards";
+import { AdvancedCharts } from "@/components/dashboard/AdvancedCharts";
+import { InsightsPanel } from "@/components/dashboard/InsightsPanel";
+import { generateSyntheticData, insertSyntheticData } from "@/services/syntheticDataService";
 
 interface LeadData {
   id: number;
@@ -31,6 +35,7 @@ const Dashboard = () => {
   const [leads, setLeads] = useState<LeadData[]>([]);
   const [filteredLeads, setFilteredLeads] = useState<LeadData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCampaign, setSelectedCampaign] = useState<string>("");
   const [selectedSpecialist, setSelectedSpecialist] = useState<string>("");
@@ -41,6 +46,7 @@ const Dashboard = () => {
 
   const fetchLeads = async () => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from('jocrosscorretores')
         .select('*')
@@ -57,6 +63,34 @@ const Dashboard = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const generateSampleData = async () => {
+    try {
+      setGenerating(true);
+      toast({
+        title: "Gerando dados...",
+        description: "Criando 150 leads sintéticos para análise",
+      });
+
+      const syntheticLeads = generateSyntheticData(150);
+      await insertSyntheticData(syntheticLeads);
+      
+      await fetchLeads();
+      
+      toast({
+        title: "Dados gerados com sucesso!",
+        description: "150 leads sintéticos foram criados para análise",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível gerar os dados sintéticos",
+        variant: "destructive",
+      });
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -81,60 +115,8 @@ const Dashboard = () => {
     setFilteredLeads(filtered);
   }, [searchTerm, selectedCampaign, selectedSpecialist, leads]);
 
-  // Métricas principais
-  const totalLeads = leads.length;
-  const leadsComPlano = leads.filter(l => l.PossuiPlanoDeSaude === 'Sim').length;
-  const taxaConversao = totalLeads > 0 ? ((leadsComPlano / totalLeads) * 100).toFixed(1) : '0';
-  
-  // Dados para gráficos
-  const campaignData = leads.reduce((acc, lead) => {
-    const campaign = lead.campanha || 'Não informado';
-    acc[campaign] = (acc[campaign] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const pieChartData = Object.entries(campaignData).map(([name, value]) => ({
-    name,
-    value,
-  }));
-
-  const planStatusData = [
-    {
-      name: 'Com Plano',
-      value: leads.filter(l => l.PossuiPlanoDeSaude === 'Sim').length,
-    },
-    {
-      name: 'Sem Plano',
-      value: leads.filter(l => l.PossuiPlanoDeSaude === 'Não').length,
-    },
-    {
-      name: 'Não Informado',
-      value: leads.filter(l => !l.PossuiPlanoDeSaude || l.PossuiPlanoDeSaude === '').length,
-    },
-  ];
-
-  const ageData = leads.reduce((acc, lead) => {
-    const age = lead.Idade || 'Não informado';
-    acc[age] = (acc[age] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const barChartData = Object.entries(ageData).map(([name, value]) => ({
-    name,
-    value,
-  }));
-
   const campaigns = [...new Set(leads.map(l => l.campanha).filter(Boolean))];
   const specialists = [...new Set(leads.map(l => l.Especialista).filter(Boolean))];
-
-  const chartConfig = {
-    value: {
-      label: "Quantidade",
-      color: "hsl(var(--primary))",
-    },
-  };
-
-  const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))'];
 
   if (loading) {
     return (
@@ -150,59 +132,33 @@ const Dashboard = () => {
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Dashboard de Corretores</h1>
-            <p className="text-muted-foreground">Análise completa dos leads e performance</p>
+            <h1 className="text-3xl font-bold">Dashboard Profissional de Corretores</h1>
+            <p className="text-muted-foreground">Análise avançada de leads com insights inteligentes</p>
           </div>
-          <Button onClick={fetchLeads} variant="outline">
-            Atualizar Dados
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={generateSampleData} 
+              variant="outline"
+              disabled={generating}
+              className="flex items-center gap-2"
+            >
+              <Database className="h-4 w-4" />
+              {generating ? "Gerando..." : "Gerar Dados"}
+            </Button>
+            <Button 
+              onClick={fetchLeads} 
+              variant="outline"
+              disabled={loading}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Atualizar
+            </Button>
+          </div>
         </div>
 
-        {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Leads</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalLeads}</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Com Plano de Saúde</CardTitle>
-              <Target className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{leadsComPlano}</div>
-              <p className="text-xs text-muted-foreground">
-                {taxaConversao}% do total
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Taxa de Conversão</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{taxaConversao}%</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Campanhas Ativas</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{campaigns.length}</div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* KPIs Avançados */}
+        <KPICards leads={leads} />
 
         {/* Filtros */}
         <Card>
@@ -266,14 +222,25 @@ const Dashboard = () => {
         </Card>
 
         {/* Tabs com conteúdo */}
-        <Tabs defaultValue="charts" className="w-full">
-          <TabsList>
-            <TabsTrigger value="charts">Gráficos</TabsTrigger>
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Visão Geral
+            </TabsTrigger>
+            <TabsTrigger value="advanced" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Análises Avançadas
+            </TabsTrigger>
+            <TabsTrigger value="insights" className="flex items-center gap-2">
+              <Lightbulb className="h-4 w-4" />
+              Insights
+            </TabsTrigger>
             <TabsTrigger value="leads">Lista de Leads</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="charts" className="space-y-6">
-            {/* Gráficos */}
+          <TabsContent value="overview" className="space-y-6">
+            {/* Gráficos Básicos */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
@@ -281,11 +248,15 @@ const Dashboard = () => {
                   <CardDescription>Leads por campanha de marketing</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ChartContainer config={chartConfig} className="h-[300px]">
+                  <ChartContainer config={{ value: { label: "Quantidade", color: "hsl(var(--primary))" } }} className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          data={pieChartData}
+                          data={Object.entries(leads.reduce((acc, lead) => {
+                            const campaign = lead.campanha || 'Não informado';
+                            acc[campaign] = (acc[campaign] || 0) + 1;
+                            return acc;
+                          }, {} as Record<string, number>)).map(([name, value]) => ({ name, value }))}
                           cx="50%"
                           cy="50%"
                           outerRadius={80}
@@ -293,8 +264,12 @@ const Dashboard = () => {
                           dataKey="value"
                           label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                         >
-                          {pieChartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          {Object.entries(leads.reduce((acc, lead) => {
+                            const campaign = lead.campanha || 'Não informado';
+                            acc[campaign] = (acc[campaign] || 0) + 1;
+                            return acc;
+                          }, {} as Record<string, number>)).map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))'][index % 4]} />
                           ))}
                         </Pie>
                         <ChartTooltip content={<ChartTooltipContent />} />
@@ -310,29 +285,13 @@ const Dashboard = () => {
                   <CardDescription>Distribuição de leads por status do plano</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ChartContainer config={chartConfig} className="h-[300px]">
+                  <ChartContainer config={{ value: { label: "Quantidade", color: "hsl(var(--primary))" } }} className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={planStatusData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <Bar dataKey="value" fill="hsl(var(--primary))" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </ChartContainer>
-                </CardContent>
-              </Card>
-
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle>Distribuição por Faixa Etária</CardTitle>
-                  <CardDescription>Análise demográfica dos leads</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ChartContainer config={chartConfig} className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={barChartData}>
+                      <BarChart data={[
+                        { name: 'Com Plano', value: leads.filter(l => l.PossuiPlanoDeSaude === 'Sim').length },
+                        { name: 'Sem Plano', value: leads.filter(l => l.PossuiPlanoDeSaude === 'Não').length },
+                        { name: 'Não Informado', value: leads.filter(l => !l.PossuiPlanoDeSaude || l.PossuiPlanoDeSaude === '').length }
+                      ]}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" />
                         <YAxis />
@@ -344,6 +303,14 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="advanced" className="space-y-6">
+            <AdvancedCharts leads={leads} />
+          </TabsContent>
+
+          <TabsContent value="insights" className="space-y-6">
+            <InsightsPanel leads={leads} />
           </TabsContent>
 
           <TabsContent value="leads">
