@@ -434,6 +434,13 @@ const Dashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      {/* Modal para exibir detalhes do lead */}
+      <LeadSummaryModal 
+        lead={selectedLead}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 };

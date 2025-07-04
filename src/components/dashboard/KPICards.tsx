@@ -87,11 +87,11 @@ export const KPICards = ({ leads }: KPICardsProps) => {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{leadScoreMedio.toFixed(0)}</div>
-          <p className="text-xs text-muted-foreground">
+          <div className="text-xs text-muted-foreground">
             <Badge variant={leadScoreMedio > 50 ? "default" : "secondary"}>
               {leadScoreMedio > 50 ? "Alto" : "Médio"}
             </Badge>
-          </p>
+          </div>
         </CardContent>
       </Card>
 

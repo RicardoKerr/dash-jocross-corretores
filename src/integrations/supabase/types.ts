@@ -206,7 +206,7 @@ export type Database = {
           PossuiPlanoDeSaude: string | null
           remoteJid: string | null
           Resumo: string | null
-          source: string | null
+          source: string
           Whatsapp_corretor: string | null
         }
         Insert: {
@@ -222,7 +222,7 @@ export type Database = {
           PossuiPlanoDeSaude?: string | null
           remoteJid?: string | null
           Resumo?: string | null
-          source?: string | null
+          source: string
           Whatsapp_corretor?: string | null
         }
         Update: {
@@ -238,7 +238,7 @@ export type Database = {
           PossuiPlanoDeSaude?: string | null
           remoteJid?: string | null
           Resumo?: string | null
-          source?: string | null
+          source?: string
           Whatsapp_corretor?: string | null
         }
         Relationships: []
