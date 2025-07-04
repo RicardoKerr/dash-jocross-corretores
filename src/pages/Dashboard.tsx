@@ -179,7 +179,7 @@ const Dashboard = () => {
         </div>
 
         {/* KPIs Avançados */}
-        <KPICards leads={leads} />
+        <KPICards leads={filteredLeads} />
 
         {/* Filtros */}
         <Card>
@@ -290,12 +290,12 @@ const Dashboard = () => {
 
           <TabsContent value="overview" className="space-y-6">
             {/* Funil de Conversão */}
-            <ConversionFunnel leads={leads} />
+            <ConversionFunnel leads={filteredLeads} />
             
             {/* Gráficos de Conversão */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ConversionPieChart leads={leads} groupBy="status" />
-              <ConversionPieChart leads={leads} groupBy="corretor" />
+              <ConversionPieChart leads={filteredLeads} groupBy="status" />
+              <ConversionPieChart leads={filteredLeads} groupBy="corretor" />
             </div>
             
             {/* Gráficos Básicos */}
@@ -309,26 +309,26 @@ const Dashboard = () => {
                   <ChartContainer config={{ value: { label: "Quantidade", color: "hsl(var(--primary))" } }} className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
-                        <Pie
-                          data={Object.entries(leads.reduce((acc, lead) => {
-                            const campaign = lead.campanha || 'Não informado';
-                            acc[campaign] = (acc[campaign] || 0) + 1;
-                            return acc;
-                          }, {} as Record<string, number>)).map(([name, value]) => ({ name, value }))}
-                          cx="50%"
-                          cy="50%"
-                          outerRadius={80}
-                          fill="hsl(var(--primary))"
-                          dataKey="value"
-                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                        >
-                          {Object.entries(leads.reduce((acc, lead) => {
-                            const campaign = lead.campanha || 'Não informado';
-                            acc[campaign] = (acc[campaign] || 0) + 1;
-                            return acc;
-                          }, {} as Record<string, number>)).map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))'][index % 4]} />
-                          ))}
+                         <Pie
+                           data={Object.entries(filteredLeads.reduce((acc, lead) => {
+                             const campaign = lead.campanha || 'Não informado';
+                             acc[campaign] = (acc[campaign] || 0) + 1;
+                             return acc;
+                           }, {} as Record<string, number>)).map(([name, value]) => ({ name, value }))}
+                           cx="50%"
+                           cy="50%"
+                           outerRadius={80}
+                           fill="hsl(var(--primary))"
+                           dataKey="value"
+                           label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                         >
+                           {Object.entries(filteredLeads.reduce((acc, lead) => {
+                             const campaign = lead.campanha || 'Não informado';
+                             acc[campaign] = (acc[campaign] || 0) + 1;
+                             return acc;
+                           }, {} as Record<string, number>)).map((entry, index) => (
+                             <Cell key={`cell-${index}`} fill={['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))'][index % 4]} />
+                           ))}
                         </Pie>
                         <ChartTooltip content={<ChartTooltipContent />} />
                       </PieChart>
@@ -345,10 +345,10 @@ const Dashboard = () => {
                 <CardContent>
                   <ChartContainer config={{ value: { label: "Quantidade", color: "hsl(var(--primary))" } }} className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={[
-                        { name: 'Com Plano', value: leads.filter(l => l.PossuiPlanoDeSaude === 'Sim').length },
-                        { name: 'Sem Plano', value: leads.filter(l => l.PossuiPlanoDeSaude === 'Não').length },
-                        { name: 'Não Informado', value: leads.filter(l => !l.PossuiPlanoDeSaude || l.PossuiPlanoDeSaude === '').length }
+                       <BarChart data={[
+                         { name: 'Com Plano', value: filteredLeads.filter(l => l.PossuiPlanoDeSaude === 'Sim').length },
+                         { name: 'Sem Plano', value: filteredLeads.filter(l => l.PossuiPlanoDeSaude === 'Não').length },
+                         { name: 'Não Informado', value: filteredLeads.filter(l => !l.PossuiPlanoDeSaude || l.PossuiPlanoDeSaude === '').length }
                       ]}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" />
@@ -364,11 +364,11 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="advanced" className="space-y-6">
-            <AdvancedCharts leads={leads} />
+            <AdvancedCharts leads={filteredLeads} />
           </TabsContent>
 
           <TabsContent value="insights" className="space-y-6">
-            <InsightsPanel leads={leads} />
+            <InsightsPanel leads={filteredLeads} />
           </TabsContent>
 
           <TabsContent value="leads">
