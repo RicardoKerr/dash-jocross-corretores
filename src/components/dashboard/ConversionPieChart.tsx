@@ -47,29 +47,29 @@ export const ConversionPieChart = ({ leads, groupBy }: ConversionPieChartProps) 
 
   const getStatusColor = (status: string, index: number) => {
     const colors = {
-      "Interessado": "hsl(var(--primary))",
-      "Negociando": "hsl(var(--secondary))",
-      "Proposta Enviada": "hsl(var(--accent))",
-      "Aguardando Documentos": "hsl(var(--muted))",
-      "Fechado": "hsl(142, 76%, 36%)", // Verde
-      "Perdido": "hsl(var(--destructive))",
+      "Interessado": "hsl(var(--chart-primary))",
+      "Negociando": "hsl(var(--chart-warning))",
+      "Proposta Enviada": "hsl(var(--chart-accent))",
+      "Aguardando Documentos": "hsl(var(--chart-info))",
+      "Fechado": "hsl(var(--chart-secondary))",
+      "Perdido": "hsl(var(--chart-error))",
       "Não definido": "hsl(var(--muted-foreground))"
     };
-    return colors[status] || `hsl(${200 + index * 40}, 70%, 50%)`;
+    return colors[status] || `hsl(var(--chart-${index % 4 === 0 ? 'purple' : index % 4 === 1 ? 'pink' : index % 4 === 2 ? 'teal' : 'orange'}))`;
   };
 
   const getCorretorColor = (index: number) => {
     const colors = [
-      "hsl(var(--primary))",
-      "hsl(var(--secondary))",
-      "hsl(var(--accent))",
-      "hsl(210, 100%, 50%)",
-      "hsl(280, 100%, 50%)",
-      "hsl(45, 100%, 50%)",
-      "hsl(120, 100%, 40%)",
-      "hsl(0, 100%, 50%)"
+      "hsl(var(--chart-primary))",
+      "hsl(var(--chart-secondary))",
+      "hsl(var(--chart-accent))",
+      "hsl(var(--chart-warning))",
+      "hsl(var(--chart-purple))",
+      "hsl(var(--chart-pink))",
+      "hsl(var(--chart-teal))",
+      "hsl(var(--chart-orange))"
     ];
-    return colors[index] || `hsl(${index * 45}, 70%, 50%)`;
+    return colors[index] || `hsl(var(--chart-info))`;
   };
 
   const chartData = getChartData();

@@ -32,7 +32,16 @@ export const AdvancedCharts = ({ leads }: AdvancedChartsProps) => {
     },
   };
 
-  const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))'];
+  const COLORS = [
+    'hsl(var(--chart-primary))', 
+    'hsl(var(--chart-secondary))', 
+    'hsl(var(--chart-accent))', 
+    'hsl(var(--chart-warning))',
+    'hsl(var(--chart-purple))',
+    'hsl(var(--chart-pink))',
+    'hsl(var(--chart-teal))',
+    'hsl(var(--chart-orange))'
+  ];
 
   // Análise por hora do dia
   const hourlyData = leads.reduce((acc, lead) => {
@@ -143,16 +152,16 @@ export const AdvancedCharts = ({ leads }: AdvancedChartsProps) => {
                   type="monotone" 
                   dataKey="leads" 
                   stackId="1"
-                  stroke="hsl(var(--primary))" 
-                  fill="hsl(var(--primary))" 
+                  stroke="hsl(var(--chart-primary))" 
+                  fill="hsl(var(--chart-primary))" 
                   fillOpacity={0.6}
                 />
                 <Area 
                   type="monotone" 
                   dataKey="conversion" 
                   stackId="2"
-                  stroke="hsl(var(--secondary))" 
-                  fill="hsl(var(--secondary))" 
+                  stroke="hsl(var(--chart-secondary))" 
+                  fill="hsl(var(--chart-secondary))" 
                   fillOpacity={0.8}
                 />
               </AreaChart>
@@ -179,7 +188,7 @@ export const AdvancedCharts = ({ leads }: AdvancedChartsProps) => {
                   <Line 
                     type="monotone" 
                     dataKey="value" 
-                    stroke="hsl(var(--primary))" 
+                    stroke="hsl(var(--chart-primary))" 
                     strokeWidth={2}
                   />
                 </LineChart>
@@ -202,7 +211,7 @@ export const AdvancedCharts = ({ leads }: AdvancedChartsProps) => {
                   <XAxis dataKey="name" />
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="value" fill="hsl(var(--primary))" />
+                  <Bar dataKey="value" fill="hsl(var(--chart-primary))" />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -223,8 +232,8 @@ export const AdvancedCharts = ({ leads }: AdvancedChartsProps) => {
                   <XAxis type="number" />
                   <YAxis dataKey="name" type="category" width={100} />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="total" fill="hsl(var(--muted))" />
-                  <Bar dataKey="converted" fill="hsl(var(--primary))" />
+                  <Bar dataKey="total" fill="hsl(var(--chart-accent))" />
+                  <Bar dataKey="converted" fill="hsl(var(--chart-secondary))" />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -245,8 +254,8 @@ export const AdvancedCharts = ({ leads }: AdvancedChartsProps) => {
                   <XAxis dataKey="name" />
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="total" fill="hsl(var(--muted))" />
-                  <Bar dataKey="converted" fill="hsl(var(--primary))" />
+                  <Bar dataKey="total" fill="hsl(var(--chart-warning))" />
+                  <Bar dataKey="converted" fill="hsl(var(--chart-secondary))" />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>

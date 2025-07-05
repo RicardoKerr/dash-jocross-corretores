@@ -41,12 +41,12 @@ export const ConversionFunnel = ({ leads }: ConversionFunnelProps) => {
 
   const getStatusColor = (status: string) => {
     const colors = {
-      "Interessado": "hsl(var(--primary))",
-      "Negociando": "hsl(var(--secondary))",
-      "Proposta Enviada": "hsl(var(--accent))",
-      "Aguardando Documentos": "hsl(var(--muted))",
-      "Fechado": "hsl(var(--success))",
-      "Perdido": "hsl(var(--destructive))"
+      "Interessado": "hsl(var(--chart-primary))",
+      "Negociando": "hsl(var(--chart-warning))",
+      "Proposta Enviada": "hsl(var(--chart-accent))",
+      "Aguardando Documentos": "hsl(var(--chart-info))",
+      "Fechado": "hsl(var(--chart-secondary))",
+      "Perdido": "hsl(var(--chart-error))"
     };
     return colors[status] || "hsl(var(--muted))";
   };

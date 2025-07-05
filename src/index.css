@@ -53,6 +53,18 @@ All colors MUST be HSL.
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Chart colors - impactful palette */
+    --chart-primary: 217 91% 60%;
+    --chart-secondary: 142 76% 36%;
+    --chart-accent: 45 93% 47%;
+    --chart-warning: 25 95% 53%;
+    --chart-error: 0 84% 60%;
+    --chart-info: 199 89% 48%;
+    --chart-purple: 262 83% 58%;
+    --chart-pink: 336 84% 57%;
+    --chart-teal: 173 58% 39%;
+    --chart-orange: 20 90% 48%;
   }
 
   .dark {
@@ -91,6 +103,18 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Chart colors - impactful palette (dark mode) */
+    --chart-primary: 217 91% 65%;
+    --chart-secondary: 142 76% 45%;
+    --chart-accent: 45 93% 55%;
+    --chart-warning: 25 95% 60%;
+    --chart-error: 0 84% 65%;
+    --chart-info: 199 89% 55%;
+    --chart-purple: 262 83% 65%;
+    --chart-pink: 336 84% 65%;
+    --chart-teal: 173 58% 45%;
+    --chart-orange: 20 90% 55%;
   }
 }
 
