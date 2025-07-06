@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -44,10 +46,10 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCampaign, setSelectedCampaign] = useState<string>("");
-  const [selectedSpecialist, setSelectedSpecialist] = useState<string>("");
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
-  const [selectedCorretor, setSelectedCorretor] = useState<string>("");
+  const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>([]);
+  const [selectedSpecialists, setSelectedSpecialists] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [selectedCorretores, setSelectedCorretores] = useState<string[]>([]);
   const [selectedLead, setSelectedLead] = useState<LeadData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -115,24 +117,33 @@ const Dashboard = () => {
       );
     }
 
-    if (selectedCampaign && selectedCampaign !== "ALL_CAMPAIGNS") {
-      filtered = filtered.filter(lead => lead.campanha === selectedCampaign);
+    if (selectedCampaigns.length > 0) {
+      filtered = filtered.filter(lead => 
+        lead.campanha && selectedCampaigns.includes(lead.campanha)
+      );
     }
 
-    if (selectedSpecialist && selectedSpecialist !== "ALL_SPECIALISTS") {
-      filtered = filtered.filter(lead => lead.Especialista === selectedSpecialist);
+    if (selectedSpecialists.length > 0) {
+      filtered = filtered.filter(lead => 
+        lead.Especialista && selectedSpecialists.includes(lead.Especialista)
+      );
     }
 
-    if (selectedStatus && selectedStatus !== "ALL_STATUS") {
-      filtered = filtered.filter(lead => lead.status_conversa === selectedStatus);
+    if (selectedStatuses.length > 0) {
+      filtered = filtered.filter(lead => 
+        lead.status_conversa && selectedStatuses.includes(lead.status_conversa)
+      );
     }
 
-    if (selectedCorretor && selectedCorretor !== "ALL_CORRETORES") {
-      filtered = filtered.filter(lead => lead.corretor_responsavel === selectedCorretor);
+    if (selectedCorretores.length > 0) {
+      filtered = filtered.filter(lead => {
+        const leadCorretorName = lead.corretor_responsavel?.split(' - ')[0] || lead.corretor_responsavel;
+        return leadCorretorName && selectedCorretores.includes(leadCorretorName);
+      });
     }
 
     setFilteredLeads(filtered);
-  }, [searchTerm, selectedCampaign, selectedSpecialist, selectedStatus, selectedCorretor, leads]);
+  }, [searchTerm, selectedCampaigns, selectedSpecialists, selectedStatuses, selectedCorretores, leads]);
 
   const campaigns = [...new Set(leads.map(l => l.campanha).filter(Boolean))];
   const specialists = [...new Set(leads.map(l => l.Especialista).filter(Boolean))];
@@ -202,66 +213,42 @@ const Dashboard = () => {
                   />
                 </div>
               </div>
-              <Select value={selectedCampaign} onValueChange={setSelectedCampaign}>
-                <SelectTrigger className="w-full md:w-[200px]">
-                  <SelectValue placeholder="Campanha" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL_CAMPAIGNS">Todas as campanhas</SelectItem>
-                  {campaigns.map((campaign) => (
-                    <SelectItem key={campaign} value={campaign}>
-                      {campaign}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={selectedSpecialist} onValueChange={setSelectedSpecialist}>
-                <SelectTrigger className="w-full md:w-[200px]">
-                  <SelectValue placeholder="Especialista" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL_SPECIALISTS">Todos os especialistas</SelectItem>
-                  {specialists.map((specialist) => (
-                    <SelectItem key={specialist} value={specialist}>
-                      {specialist}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger className="w-full md:w-[180px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL_STATUS">Todos os status</SelectItem>
-                  {statuses.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={selectedCorretor} onValueChange={setSelectedCorretor}>
-                <SelectTrigger className="w-full md:w-[180px]">
-                  <SelectValue placeholder="Corretor" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL_CORRETORES">Todos os corretores</SelectItem>
-                  {corretores.map((corretor) => (
-                    <SelectItem key={corretor} value={corretor}>
-                      {corretor?.split(' - ')[0] || corretor}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <MultiSelect
+                options={campaigns}
+                selectedValues={selectedCampaigns}
+                onValueChange={setSelectedCampaigns}
+                placeholder="Campanha"
+                className="w-full md:w-[200px]"
+              />
+              <MultiSelect
+                options={specialists}
+                selectedValues={selectedSpecialists}
+                onValueChange={setSelectedSpecialists}
+                placeholder="Especialista"
+                className="w-full md:w-[200px]"
+              />
+              <MultiSelect
+                options={statuses}
+                selectedValues={selectedStatuses}
+                onValueChange={setSelectedStatuses}
+                placeholder="Status"
+                className="w-full md:w-[180px]"
+              />
+              <MultiSelect
+                options={corretores.map(corretor => corretor?.split(' - ')[0] || corretor)}
+                selectedValues={selectedCorretores}
+                onValueChange={setSelectedCorretores}
+                placeholder="Corretor"
+                className="w-full md:w-[180px]"
+              />
               <Button 
                 variant="outline" 
                 onClick={() => {
                   setSearchTerm("");
-                  setSelectedCampaign("ALL_CAMPAIGNS");
-                  setSelectedSpecialist("ALL_SPECIALISTS");
-                  setSelectedStatus("ALL_STATUS");
-                  setSelectedCorretor("ALL_CORRETORES");
+                  setSelectedCampaigns([]);
+                  setSelectedSpecialists([]);
+                  setSelectedStatuses([]);
+                  setSelectedCorretores([]);
                 }}
               >
                 Limpar
