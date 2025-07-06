@@ -308,15 +308,22 @@ const Dashboard = () => {
                            fill="hsl(var(--primary))"
                            dataKey="value"
                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                         >
-                           {Object.entries(filteredLeads.reduce((acc, lead) => {
-                             const campaign = lead.campanha || 'Não informado';
-                             acc[campaign] = (acc[campaign] || 0) + 1;
-                             return acc;
-                           }, {} as Record<string, number>)).map((entry, index) => (
-                             <Cell key={`cell-${index}`} fill={['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))'][index % 4]} />
-                           ))}
-                        </Pie>
+                          >
+                            {Object.entries(filteredLeads.reduce((acc, lead) => {
+                              const campaign = lead.campanha || 'Não informado';
+                              acc[campaign] = (acc[campaign] || 0) + 1;
+                              return acc;
+                            }, {} as Record<string, number>)).map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={[
+                                'hsl(var(--chart-primary))', 
+                                'hsl(var(--chart-secondary))', 
+                                'hsl(var(--chart-accent))', 
+                                'hsl(var(--chart-warning))',
+                                'hsl(var(--chart-info))',
+                                'hsl(var(--chart-error))'
+                              ][index % 6]} />
+                            ))}
+                         </Pie>
                         <ChartTooltip content={<ChartTooltipContent />} />
                       </PieChart>
                     </ResponsiveContainer>
@@ -333,16 +340,24 @@ const Dashboard = () => {
                   <ChartContainer config={{ value: { label: "Quantidade", color: "hsl(var(--primary))" } }} className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                        <BarChart data={[
-                         { name: 'Com Plano', value: filteredLeads.filter(l => l.PossuiPlanoDeSaude === 'Sim').length },
-                         { name: 'Sem Plano', value: filteredLeads.filter(l => l.PossuiPlanoDeSaude === 'Não').length },
-                         { name: 'Não Informado', value: filteredLeads.filter(l => !l.PossuiPlanoDeSaude || l.PossuiPlanoDeSaude === '').length }
+                         { name: 'Com Plano', value: filteredLeads.filter(l => l.PossuiPlanoDeSaude === 'Sim').length, fill: 'hsl(var(--chart-secondary))' },
+                         { name: 'Sem Plano', value: filteredLeads.filter(l => l.PossuiPlanoDeSaude === 'Não').length, fill: 'hsl(var(--chart-error))' },
+                         { name: 'Não Informado', value: filteredLeads.filter(l => !l.PossuiPlanoDeSaude || l.PossuiPlanoDeSaude === '').length, fill: 'hsl(var(--chart-warning))' }
                       ]}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <Bar dataKey="value" fill="hsl(var(--primary))" />
-                      </BarChart>
+                         <CartesianGrid strokeDasharray="3 3" />
+                         <XAxis dataKey="name" />
+                         <YAxis />
+                         <ChartTooltip content={<ChartTooltipContent />} />
+                         <Bar dataKey="value">
+                           {[
+                             { name: 'Com Plano', value: filteredLeads.filter(l => l.PossuiPlanoDeSaude === 'Sim').length, fill: 'hsl(var(--chart-secondary))' },
+                             { name: 'Sem Plano', value: filteredLeads.filter(l => l.PossuiPlanoDeSaude === 'Não').length, fill: 'hsl(var(--chart-error))' },
+                             { name: 'Não Informado', value: filteredLeads.filter(l => !l.PossuiPlanoDeSaude || l.PossuiPlanoDeSaude === '').length, fill: 'hsl(var(--chart-warning))' }
+                           ].map((entry, index) => (
+                             <Cell key={`cell-${index}`} fill={entry.fill} />
+                           ))}
+                         </Bar>
+                       </BarChart>
                     </ResponsiveContainer>
                   </ChartContainer>
                 </CardContent>
