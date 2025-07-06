@@ -4,6 +4,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer,
   LineChart, Line, PieChart, Pie, Cell, Area, AreaChart
 } from "recharts";
+import { BrazilMap } from "./BrazilMap";
 
 interface LeadData {
   id: number;
@@ -262,6 +263,9 @@ export const AdvancedCharts = ({ leads }: AdvancedChartsProps) => {
           </CardContent>
         </Card>
       </div>
+      
+      {/* Mapa do Brasil */}
+      <BrazilMap leads={leads} />
     </div>
   );
 };
