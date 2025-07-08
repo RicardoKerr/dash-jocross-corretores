@@ -47,7 +47,7 @@ const Dashboard = () => {
   const [generating, setGenerating] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>([]);
-  const [selectedSpecialists, setSelectedSpecialists] = useState<string[]>([]);
+  
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedCorretores, setSelectedCorretores] = useState<string[]>([]);
   const [selectedLead, setSelectedLead] = useState<LeadData | null>(null);
@@ -123,11 +123,6 @@ const Dashboard = () => {
       );
     }
 
-    if (selectedSpecialists.length > 0) {
-      filtered = filtered.filter(lead => 
-        lead.Especialista && selectedSpecialists.includes(lead.Especialista)
-      );
-    }
 
     if (selectedStatuses.length > 0) {
       filtered = filtered.filter(lead => 
@@ -143,10 +138,10 @@ const Dashboard = () => {
     }
 
     setFilteredLeads(filtered);
-  }, [searchTerm, selectedCampaigns, selectedSpecialists, selectedStatuses, selectedCorretores, leads]);
+  }, [searchTerm, selectedCampaigns, selectedStatuses, selectedCorretores, leads]);
 
   const campaigns = [...new Set(leads.map(l => l.campanha).filter(Boolean))];
-  const specialists = [...new Set(leads.map(l => l.Especialista).filter(Boolean))];
+  
   const statuses = [...new Set(leads.map(l => l.status_conversa).filter(Boolean))];
   const corretores = [...new Set(leads.map(l => l.corretor_responsavel).filter(Boolean))];
 
@@ -221,13 +216,6 @@ const Dashboard = () => {
                 className="w-full md:w-[200px]"
               />
               <MultiSelect
-                options={specialists}
-                selectedValues={selectedSpecialists}
-                onValueChange={setSelectedSpecialists}
-                placeholder="Especialista"
-                className="w-full md:w-[200px]"
-              />
-              <MultiSelect
                 options={statuses}
                 selectedValues={selectedStatuses}
                 onValueChange={setSelectedStatuses}
@@ -246,7 +234,6 @@ const Dashboard = () => {
                 onClick={() => {
                   setSearchTerm("");
                   setSelectedCampaigns([]);
-                  setSelectedSpecialists([]);
                   setSelectedStatuses([]);
                   setSelectedCorretores([]);
                 }}
