@@ -35,7 +35,7 @@ export const KPICards = ({ leads }: KPICardsProps) => {
     return hoje === leadDate;
   }).length;
   
-  const especialistasAtivos = new Set(leads.map(l => l.Especialista).filter(Boolean)).size;
+  const corretoresAtivos = new Set(leads.map(l => l.Whatsapp_corretor).filter(Boolean)).size;
   
   // Lead Score médio (simulado baseado em critérios)
   const leadScoreMedio = leads.reduce((acc, lead) => {
@@ -127,7 +127,7 @@ export const KPICards = ({ leads }: KPICardsProps) => {
           <Building className="h-4 w-4" style={{ color: 'hsl(var(--chart-error))' }} />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-chart-error">{especialistasAtivos}</div>
+          <div className="text-2xl font-bold text-chart-error">{corretoresAtivos}</div>
           <p className="text-xs text-muted-foreground">
             Profissionais ativos
           </p>
