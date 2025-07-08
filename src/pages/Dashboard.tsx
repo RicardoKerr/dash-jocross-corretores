@@ -131,10 +131,9 @@ const Dashboard = () => {
     }
 
     if (selectedCorretores.length > 0) {
-      filtered = filtered.filter(lead => {
-        const leadCorretorName = lead.corretor_responsavel?.split(' - ')[0] || lead.corretor_responsavel;
-        return leadCorretorName && selectedCorretores.includes(leadCorretorName);
-      });
+      filtered = filtered.filter(lead => 
+        lead.Whatsapp_corretor && selectedCorretores.includes(lead.Whatsapp_corretor)
+      );
     }
 
     setFilteredLeads(filtered);
@@ -143,7 +142,7 @@ const Dashboard = () => {
   const campaigns = [...new Set(leads.map(l => l.campanha).filter(Boolean))];
   
   const statuses = [...new Set(leads.map(l => l.status_conversa).filter(Boolean))];
-  const corretores = [...new Set(leads.map(l => l.corretor_responsavel).filter(Boolean))];
+  const corretores = [...new Set(leads.map(l => l.Whatsapp_corretor).filter(Boolean))];
 
   if (loading) {
     return (
@@ -223,7 +222,7 @@ const Dashboard = () => {
                 className="w-full md:w-[180px]"
               />
               <MultiSelect
-                options={corretores.map(corretor => corretor?.split(' - ')[0] || corretor)}
+                options={corretores}
                 selectedValues={selectedCorretores}
                 onValueChange={setSelectedCorretores}
                 placeholder="Corretor"
@@ -387,7 +386,7 @@ const Dashboard = () => {
                           <TableCell>
                             <Badge variant="outline">{lead.status_conversa || 'N/A'}</Badge>
                           </TableCell>
-                          <TableCell>{lead.corretor_responsavel?.split(' - ')[0] || 'N/A'}</TableCell>
+                          <TableCell>{lead.Whatsapp_corretor || 'N/A'}</TableCell>
                           <TableCell>
                             <Badge variant="outline">{lead.campanha || 'N/A'}</Badge>
                           </TableCell>
