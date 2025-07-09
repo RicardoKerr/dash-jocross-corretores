@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -47,6 +49,7 @@ const Dashboard = () => {
   const [generating, setGenerating] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>([]);
+  const { isAdmin } = useAuth();
   
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedCorretores, setSelectedCorretores] = useState<string[]>([]);
@@ -153,35 +156,39 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Dashboard Profissional de Corretores</h1>
-            <p className="text-muted-foreground">Análise avançada de leads com insights inteligentes</p>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="p-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Header */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">Dashboard Profissional de Corretores</h1>
+              <p className="text-muted-foreground">Análise avançada de leads com insights inteligentes</p>
+            </div>
+            <div className="flex gap-2">
+              {isAdmin && (
+                <Button 
+                  onClick={generateSampleData} 
+                  variant="outline"
+                  disabled={generating}
+                  className="flex items-center gap-2"
+                >
+                  <Database className="h-4 w-4" />
+                  {generating ? "Gerando..." : "Gerar Dados"}
+                </Button>
+              )}
+              <Button 
+                onClick={fetchLeads} 
+                variant="outline"
+                disabled={loading}
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Atualizar
+              </Button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button 
-              onClick={generateSampleData} 
-              variant="outline"
-              disabled={generating}
-              className="flex items-center gap-2"
-            >
-              <Database className="h-4 w-4" />
-              {generating ? "Gerando..." : "Gerar Dados"}
-            </Button>
-            <Button 
-              onClick={fetchLeads} 
-              variant="outline"
-              disabled={loading}
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Atualizar
-            </Button>
-          </div>
-        </div>
 
         {/* KPIs Avançados */}
         <KPICards leads={filteredLeads} />
@@ -421,13 +428,17 @@ const Dashboard = () => {
             </Card>
           </TabsContent>
         </Tabs>
+        </div>
       </div>
       
       {/* Modal para exibir detalhes do lead */}
       <LeadSummaryModal 
         lead={selectedLead}
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedLead(null);
+        }}
       />
     </div>
   );

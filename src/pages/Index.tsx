@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Users, TrendingUp } from "lucide-react";
+import { BarChart, Users, TrendingUp, LogIn } from "lucide-react";
 
 const Index = () => {
   return (
@@ -14,12 +14,20 @@ const Index = () => {
         <p className="text-xl text-muted-foreground mb-8 max-w-2xl">
           Dashboard profissional para análise de leads, performance de campanhas e gestão de corretores de seguros
         </p>
-        <Link to="/dashboard">
-          <Button size="lg" className="text-lg px-8 py-3">
-            <BarChart className="mr-2 h-5 w-5" />
-            Acessar Dashboard
-          </Button>
-        </Link>
+        <div className="flex gap-4 justify-center flex-wrap">
+          <Link to="/auth">
+            <Button size="lg" className="text-lg px-8 py-3 gap-2">
+              <LogIn className="h-5 w-5" />
+              Fazer Login
+            </Button>
+          </Link>
+          <Link to="/dashboard">
+            <Button size="lg" variant="outline" className="text-lg px-8 py-3 gap-2">
+              <BarChart className="h-5 w-5" />
+              Ver Dashboard
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Features Section */}
