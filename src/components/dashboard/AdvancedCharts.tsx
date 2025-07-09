@@ -69,14 +69,21 @@ export const AdvancedCharts = ({ leads }: AdvancedChartsProps) => {
     value,
   }));
 
-  // Análise de tendência temporal (últimos 30 dias)
-  const last30Days = Array.from({ length: 30 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - (29 - i));
+  // Análise de tendência temporal (últimos 30/31 dias do mês atual)
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
+  
+  // Calcular o número de dias no mês atual
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  
+  // Gerar array com todos os dias do mês atual
+  const currentMonthDays = Array.from({ length: daysInMonth }, (_, i) => {
+    const date = new Date(currentYear, currentMonth, i + 1);
     return date.toISOString().split('T')[0];
   });
 
-  const trendData = last30Days.map(date => {
+  const trendData = currentMonthDays.map(date => {
     const count = leads.filter(lead => 
       lead.created_at.split('T')[0] === date
     ).length;
@@ -135,18 +142,25 @@ export const AdvancedCharts = ({ leads }: AdvancedChartsProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Tendência Temporal */}
+      {/* Tendência Temporal - Ocupando toda a largura */}
       <Card>
         <CardHeader>
-          <CardTitle>Tendência de Leads - Últimos 30 Dias</CardTitle>
-          <CardDescription>Evolução diária de leads e conversões</CardDescription>
+          <CardTitle>Tendência de Leads - Últimos {daysInMonth} Dias</CardTitle>
+          <CardDescription>Evolução diária de leads e conversões no mês atual</CardDescription>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={chartConfig} className="h-[300px]">
+          <ChartContainer config={chartConfig} className="h-[450px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={trendData}>
+              <AreaChart data={trendData} margin={{ top: 10, right: 30, left: 0, bottom: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
+                <XAxis 
+                  dataKey="date" 
+                  angle={-45}
+                  textAnchor="end"
+                  height={60}
+                  interval={0}
+                  fontSize={12}
+                />
                 <YAxis />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Area 
@@ -156,6 +170,7 @@ export const AdvancedCharts = ({ leads }: AdvancedChartsProps) => {
                   stroke="hsl(var(--chart-primary))" 
                   fill="hsl(var(--chart-primary))" 
                   fillOpacity={0.6}
+                  name="Total de Leads"
                 />
                 <Area 
                   type="monotone" 
@@ -164,6 +179,7 @@ export const AdvancedCharts = ({ leads }: AdvancedChartsProps) => {
                   stroke="hsl(var(--chart-secondary))" 
                   fill="hsl(var(--chart-secondary))" 
                   fillOpacity={0.8}
+                  name="Conversões"
                 />
               </AreaChart>
             </ResponsiveContainer>
