@@ -137,6 +137,18 @@ export function generateSyntheticData(count: number = 150): SyntheticLead[] {
 }
 
 export async function insertSyntheticData(leads: SyntheticLead[]) {
+  // Verificar se o usuário é admin antes de executar operações perigosas
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) {
+    throw new Error('Usuário não autenticado');
+  }
+
+  // Verificar permissões de admin
+  const { data: isAdmin } = await supabase.rpc('is_admin', { user_uuid: user.user.id });
+  if (!isAdmin) {
+    throw new Error('Acesso negado: apenas administradores podem inserir dados sintéticos');
+  }
+  
   // Deletar dados existentes
   await supabase.from('jocrosscorretores').delete().neq('id', 0);
   

@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useSecurityMonitoring } from '@/hooks/useSecurityMonitoring';
+import { clearAdminCache } from '@/utils/securityValidation';
 
 interface AuthContextType {
   user: User | null;
@@ -17,6 +19,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const { logSecurityEvent } = useSecurityMonitoring();
 
   useEffect(() => {
     // Set up auth state listener
@@ -55,7 +58,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      // Log security event before signing out
+      if (user) {
+        logSecurityEvent({
+          event_type: 'admin_action',
+          user_id: user.id,
+          details: { action: 'logout' }
+        });
+      }
+      
+      // Clear admin cache
+      clearAdminCache();
+      
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error during sign out:', error);
+      throw error;
+    }
   };
 
   const value = {
