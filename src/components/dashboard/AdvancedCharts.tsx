@@ -64,9 +64,12 @@ export const AdvancedCharts = ({ leads }: AdvancedChartsProps) => {
     return acc;
   }, {} as Record<string, number>);
 
-  const weeklyChartData = Object.entries(weeklyData).map(([name, value]) => ({
-    name,
-    value,
+  // Fixed weekdays starting from Monday
+  const weekDays = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+  
+  const weeklyChartData = weekDays.map(day => ({
+    name: day,
+    value: weeklyData[day] || 0,
   }));
 
   // Análise de tendência temporal (últimos 30/31 dias do mês atual)
